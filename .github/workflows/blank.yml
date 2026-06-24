@@ -16,6 +16,10 @@ jobs:
         java-version: '21'
         distribution: 'temurin'
 
+    - name: Fix Missing Keystore Bug
+      run: |
+        sed -i 's/signingConfig = signingConfigs.getByName("debugConfig")/\/\/ signingConfig removed/g' app/build.gradle.kts
+
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@v3
 
@@ -27,4 +31,5 @@ jobs:
       with:
         name: app-debug
         path: app/build/outputs/apk/debug/app-debug.apk
-        
+
+
