@@ -1,0 +1,6 @@
+{
+  "name": "Phantom",
+  "description": "Sleek crypto wallet replica featuring seed phrase management, token portfolios, deposit flows, and instant blockchain transactions.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
