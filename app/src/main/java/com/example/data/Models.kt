@@ -99,3 +99,40 @@ val HelpTopicsList = listOf(
 )
 
 val HelpTopics = HelpTopicsList
+
+data class CoinCatalogItem(
+    val symbol: String,
+    val name: String,
+    val priceUsd: Double,
+    val change24h: Float,
+    val iconColorHex: String,
+    val category: String = "Solana DeFi"
+)
+
+val ALL_SOLANA_COINS = listOf(
+    CoinCatalogItem("SOL", "Solana", 145.20, +5.12f, "#14F195", "Layer 1"),
+    CoinCatalogItem("USDC", "USD Coin", 1.00, +0.01f, "#2775CA", "Stablecoin"),
+    CoinCatalogItem("USDT", "Tether USD", 1.00, -0.02f, "#26A17B", "Stablecoin"),
+    CoinCatalogItem("BTC", "Bitcoin (Portal)", 62057.00, -0.08f, "#F7931A", "Wrapped L1"),
+    CoinCatalogItem("ETH", "Ethereum (Portal)", 1653.01, +0.29f, "#627EEA", "Wrapped L1"),
+    CoinCatalogItem("JUP", "Jupiter", 0.92, +8.40f, "#26C59A", "DEX Aggregator"),
+    CoinCatalogItem("BONK", "Bonk", 0.000028, +14.50f, "#E3872D", "Meme"),
+    CoinCatalogItem("WIF", "dogwifhat", 2.45, +22.10f, "#C4A482", "Meme"),
+    CoinCatalogItem("RAY", "Raydium", 2.10, +4.15f, "#4C52EC", "DEX / AMM"),
+    CoinCatalogItem("RENDER", "Render Network", 7.85, +6.30f, "#E51B24", "AI / DePIN"),
+    CoinCatalogItem("PYTH", "Pyth Network", 0.38, -1.20f, "#9945FF", "Oracle"),
+    CoinCatalogItem("JTO", "Jito", 3.15, +9.80f, "#70C7BA", "Liquid Staking"),
+    CoinCatalogItem("ORCA", "Orca", 3.40, +2.10f, "#FAD75A", "DEX / AMM"),
+    CoinCatalogItem("HNT", "Helium", 4.80, -0.50f, "#474DFF", "DePIN"),
+    CoinCatalogItem("MSOL", "Marinade Staked SOL", 168.40, +5.10f, "#3023AE", "Liquid Staking"),
+    CoinCatalogItem("POPCAT", "Popcat", 1.15, +18.40f, "#EAA221", "Meme"),
+    CoinCatalogItem("MEW", "cat in a dogs world", 0.0058, +11.20f, "#F5ACB8", "Meme"),
+    CoinCatalogItem("DRIFT", "Drift Protocol", 0.55, +3.40f, "#6851FF", "Perp DEX"),
+    CoinCatalogItem("TNSR", "Tensor", 0.72, -2.10f, "#27272A", "NFT Marketplace"),
+    CoinCatalogItem("SLERF", "Slerf", 0.25, +5.60f, "#5C81A6", "Meme"),
+    CoinCatalogItem("SPCX", "SPCX Token", 152.69, +1.60f, "#16161A", "Ecosystem"),
+    CoinCatalogItem("KINS", "KINS Sol", 0.0129, +9.88f, "#C4E8F8", "Gaming"),
+    CoinCatalogItem("CARDS", "CARDS Protocol", 0.30, +16.96f, "#221D1A", "SocialFi"),
+    CoinCatalogItem("BSL", "BankSol Liquidity", 12.50, +4.20f, "#9945FF", "Yield Vault")
+)
+

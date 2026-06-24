@@ -70,11 +70,19 @@ class WalletViewModel(application: Application) : AndroidViewModel(application) 
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), DashboardState())
 
+    private var cleanSeeded = false
+
     init {
         viewModelScope.launch {
             repository.allWallets.collect { wallets ->
-                if (wallets.isNotEmpty() && _activeScreen.value is AppScreen.Onboarding) {
-                    _activeScreen.value = AppScreen.Dashboard
+                if (wallets.isNotEmpty()) {
+                    if (!cleanSeeded) {
+                        cleanSeeded = true
+                        repository.seedIfEmptyForAllWallets(wallets)
+                    }
+                    if (_activeScreen.value is AppScreen.Onboarding) {
+                        _activeScreen.value = AppScreen.Dashboard
+                    }
                 }
             }
         }
@@ -115,6 +123,15 @@ class WalletViewModel(application: Application) : AndroidViewModel(application) 
         viewModelScope.launch {
             repository.selectWallet(walletId)
             showToast("Switched active wallet")
+        }
+    }
+
+    fun finishUsernameSetup(wallet: WalletEntity, username: String) {
+        viewModelScope.launch {
+            val formattedName = if (username.startsWith("@")) username else "@$username"
+            repository.renameWallet(wallet, formattedName)
+            _activeScreen.value = AppScreen.Dashboard
+            showToast("Welcome $formattedName")
         }
     }
 

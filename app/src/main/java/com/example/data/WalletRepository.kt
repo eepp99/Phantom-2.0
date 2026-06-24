@@ -21,6 +21,10 @@ class WalletRepository(private val db: AppDatabase) {
         walletDao.selectWallet(walletId)
     }
 
+    suspend fun renameWallet(wallet: WalletEntity, newName: String) {
+        walletDao.insertWallet(wallet.copy(name = newName))
+    }
+
     suspend fun createNewWallet(name: String, customSeed: String? = null): WalletEntity {
         val seed = customSeed ?: generateSeedPhrase()
         val address = generateSolanaAddress()
@@ -42,13 +46,42 @@ class WalletRepository(private val db: AppDatabase) {
         createNewWallet("Main Wallet")
     }
 
+    suspend fun seedIfEmptyForAllWallets(wallets: List<WalletEntity>) {
+        wallets.forEach { w ->
+            val existing = tokenDao.getToken(w.address, "SOL")
+            if (existing == null) {
+                populateInitialData(w.address)
+            }
+        }
+    }
+
     private suspend fun populateInitialData(address: String) {
+        tokenDao.deleteTokensForWallet(address)
         val tokens = listOf(
-            TokenBalanceEntity(walletAddress = address, symbol = "SOL", name = "Solana", balance = 14.52, priceUsd = 142.80, change24h = 6.42f, iconColorHex = "#9945FF"),
-            TokenBalanceEntity(walletAddress = address, symbol = "USDC", name = "USD Coin", balance = 450.00, priceUsd = 1.00, change24h = 0.01f, iconColorHex = "#2775CA"),
-            TokenBalanceEntity(walletAddress = address, symbol = "BONK", name = "Bonk", balance = 1250000.0, priceUsd = 0.000028, change24h = 18.5f, iconColorHex = "#F5A623"),
-            TokenBalanceEntity(walletAddress = address, symbol = "JUP", name = "Jupiter", balance = 85.0, priceUsd = 0.92, change24h = -2.15f, iconColorHex = "#14F195"),
-            TokenBalanceEntity(walletAddress = address, symbol = "RAY", name = "Raydium", balance = 30.0, priceUsd = 2.10, change24h = 4.20f, iconColorHex = "#38BDF8")
+            TokenBalanceEntity(walletAddress = address, symbol = "SOL", name = "Solana", balance = 1.5, priceUsd = 145.20, change24h = 5.12f, iconColorHex = "#14F195"),
+            TokenBalanceEntity(walletAddress = address, symbol = "USDC", name = "USD Coin", balance = 50.0, priceUsd = 1.00, change24h = 0.01f, iconColorHex = "#2775CA"),
+            TokenBalanceEntity(walletAddress = address, symbol = "USDT", name = "Tether USD", balance = 0.0, priceUsd = 1.00, change24h = -0.02f, iconColorHex = "#26A17B"),
+            TokenBalanceEntity(walletAddress = address, symbol = "BTC", name = "Bitcoin (Portal)", balance = 0.0, priceUsd = 62057.00, change24h = -0.08f, iconColorHex = "#F7931A"),
+            TokenBalanceEntity(walletAddress = address, symbol = "ETH", name = "Ethereum (Portal)", balance = 0.0, priceUsd = 1653.01, change24h = 0.29f, iconColorHex = "#627EEA"),
+            TokenBalanceEntity(walletAddress = address, symbol = "JUP", name = "Jupiter", balance = 25.0, priceUsd = 0.92, change24h = 8.40f, iconColorHex = "#26C59A"),
+            TokenBalanceEntity(walletAddress = address, symbol = "BONK", name = "Bonk", balance = 500000.0, priceUsd = 0.000028, change24h = 14.50f, iconColorHex = "#E3872D"),
+            TokenBalanceEntity(walletAddress = address, symbol = "WIF", name = "dogwifhat", balance = 0.0, priceUsd = 2.45, change24h = 22.10f, iconColorHex = "#C4A482"),
+            TokenBalanceEntity(walletAddress = address, symbol = "RAY", name = "Raydium", balance = 0.0, priceUsd = 2.10, change24h = 4.15f, iconColorHex = "#4C52EC"),
+            TokenBalanceEntity(walletAddress = address, symbol = "RENDER", name = "Render Network", balance = 0.0, priceUsd = 7.85, change24h = 6.30f, iconColorHex = "#E51B24"),
+            TokenBalanceEntity(walletAddress = address, symbol = "PYTH", name = "Pyth Network", balance = 0.0, priceUsd = 0.38, change24h = -1.20f, iconColorHex = "#9945FF"),
+            TokenBalanceEntity(walletAddress = address, symbol = "JTO", name = "Jito", balance = 0.0, priceUsd = 3.15, change24h = 9.80f, iconColorHex = "#70C7BA"),
+            TokenBalanceEntity(walletAddress = address, symbol = "ORCA", name = "Orca", balance = 0.0, priceUsd = 3.40, change24h = 2.10f, iconColorHex = "#FAD75A"),
+            TokenBalanceEntity(walletAddress = address, symbol = "HNT", name = "Helium", balance = 0.0, priceUsd = 4.80, change24h = -0.50f, iconColorHex = "#474DFF"),
+            TokenBalanceEntity(walletAddress = address, symbol = "MSOL", name = "Marinade Staked SOL", balance = 0.0, priceUsd = 168.40, change24h = 5.10f, iconColorHex = "#3023AE"),
+            TokenBalanceEntity(walletAddress = address, symbol = "POPCAT", name = "Popcat", balance = 0.0, priceUsd = 1.15, change24h = 18.40f, iconColorHex = "#EAA221"),
+            TokenBalanceEntity(walletAddress = address, symbol = "MEW", name = "cat in a dogs world", balance = 0.0, priceUsd = 0.0058, change24h = 11.20f, iconColorHex = "#F5ACB8"),
+            TokenBalanceEntity(walletAddress = address, symbol = "DRIFT", name = "Drift Protocol", balance = 0.0, priceUsd = 0.55, change24h = 3.40f, iconColorHex = "#6851FF"),
+            TokenBalanceEntity(walletAddress = address, symbol = "TNSR", name = "Tensor", balance = 0.0, priceUsd = 0.72, change24h = -2.10f, iconColorHex = "#27272A"),
+            TokenBalanceEntity(walletAddress = address, symbol = "SLERF", name = "Slerf", balance = 0.0, priceUsd = 0.25, change24h = 5.60f, iconColorHex = "#5C81A6"),
+            TokenBalanceEntity(walletAddress = address, symbol = "SPCX", name = "SPCX Token", balance = 0.0, priceUsd = 152.69, change24h = 1.60f, iconColorHex = "#16161A"),
+            TokenBalanceEntity(walletAddress = address, symbol = "KINS", name = "KINS Sol", balance = 0.0, priceUsd = 0.0129, change24h = 9.88f, iconColorHex = "#C4E8F8"),
+            TokenBalanceEntity(walletAddress = address, symbol = "CARDS", name = "CARDS Protocol", balance = 0.0, priceUsd = 0.30, change24h = 16.96f, iconColorHex = "#221D1A"),
+            TokenBalanceEntity(walletAddress = address, symbol = "BSL", name = "BankSol Liquidity", balance = 0.0, priceUsd = 12.50, change24h = 4.20f, iconColorHex = "#9945FF")
         )
         tokens.forEach { tokenDao.insertToken(it) }
 

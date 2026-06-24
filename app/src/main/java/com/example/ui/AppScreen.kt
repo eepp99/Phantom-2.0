@@ -9,7 +9,9 @@ import com.example.data.WalletEntity
 sealed class AppScreen {
     object Onboarding : AppScreen()
     data class SeedBackup(val wallet: WalletEntity, val isNew: Boolean) : AppScreen()
+    data class ChooseUsername(val wallet: WalletEntity) : AppScreen()
     object Dashboard : AppScreen()
+    object AccountsModal : AppScreen()
     object SendFlow : AppScreen()
     object ReceiveModal : AppScreen()
     object DepositModal : AppScreen()

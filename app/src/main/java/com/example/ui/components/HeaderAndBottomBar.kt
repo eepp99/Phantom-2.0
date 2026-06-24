@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -16,10 +17,15 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBalanceWallet
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.ContentCopy
+import androidx.compose.material.icons.filled.Face
+import androidx.compose.material.icons.filled.GridView
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.SwapHoriz
@@ -28,14 +34,20 @@ import androidx.compose.material.icons.outlined.History
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material.icons.outlined.SwapHoriz
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -50,6 +62,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.data.WalletEntity
+import com.example.ui.theme.PhantomAvatarBlue
+import com.example.ui.theme.PhantomAvatarYellow
 import com.example.ui.theme.PhantomBg
 import com.example.ui.theme.PhantomBorder
 import com.example.ui.theme.PhantomPurple
@@ -63,137 +77,191 @@ import com.example.ui.theme.SolanaTeal
 fun PhantomTopHeader(
     wallets: List<WalletEntity>,
     currentWallet: WalletEntity?,
-    onSelectWallet: (Int) -> Unit,
-    onCreateNewWallet: () -> Unit,
-    onCopyAddress: () -> Unit
+    activeTopTab: Int, // 0: Home, 1: Trade, 2: Explore
+    onSelectTopTab: (Int) -> Unit,
+    onOpenAccountsModal: () -> Unit
 ) {
-    var showDropdown by remember { mutableStateOf(false) }
-
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 12.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
+            .padding(horizontal = 16.dp, vertical = 10.dp),
+        horizontalArrangement = Arrangement.Start,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Account Switcher Dropdown
-        Box {
-            Surface(
-                color = PhantomSurfaceHigh,
-                shape = RoundedCornerShape(20.dp),
-                modifier = Modifier.clickable { showDropdown = true }
-            ) {
-                Row(
-                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .size(24.dp)
-                            .clip(CircleShape)
-                            .background(PhantomPurple),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.AccountBalanceWallet,
-                            contentDescription = "Wallet Icon",
-                            tint = PhantomBg,
-                            modifier = Modifier.size(14.dp)
-                        )
-                    }
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = currentWallet?.name ?: "Main Wallet",
-                        color = PhantomText,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 14.sp
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Icon(
-                        imageVector = Icons.Default.KeyboardArrowDown,
-                        contentDescription = "Switch Account",
-                        tint = PhantomTextSecondary,
-                        modifier = Modifier.size(18.dp)
-                    )
-                }
-            }
-
-            DropdownMenu(
-                expanded = showDropdown,
-                onDismissRequest = { showDropdown = false },
+        // Far Left Avatar Circle (Yellow/Blue with Character/Sunglasses feel)
+        Box(
+            modifier = Modifier
+                .size(38.dp)
+                .clip(CircleShape)
+                .background(PhantomAvatarYellow)
+                .clickable { onOpenAccountsModal() },
+            contentAlignment = Alignment.Center
+        ) {
+            Box(
                 modifier = Modifier
-                    .background(PhantomSurface)
-                    .width(220.dp)
+                    .size(24.dp)
+                    .clip(CircleShape)
+                    .background(PhantomAvatarBlue),
+                contentAlignment = Alignment.Center
             ) {
-                Text(
-                    "YOUR WALLETS",
-                    color = PhantomTextSecondary,
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
-                )
-                wallets.forEach { wallet ->
-                    DropdownMenuItem(
-                        text = {
-                            Column {
-                                Text(wallet.name, color = PhantomText, fontWeight = FontWeight.SemiBold)
-                                Text(truncateAddr(wallet.address), color = PhantomTextSecondary, fontSize = 11.sp)
-                            }
-                        },
-                        trailingIcon = {
-                            if (wallet.isSelected) {
-                                Icon(Icons.Default.Check, contentDescription = "Selected", tint = SolanaTeal, modifier = Modifier.size(18.dp))
-                            }
-                        },
-                        onClick = {
-                            showDropdown = false
-                            onSelectWallet(wallet.id)
-                        }
-                    )
-                }
-                DropdownMenuItem(
-                    text = { Text("+ Create Another Wallet", color = PhantomPurple, fontWeight = FontWeight.Bold) },
-                    onClick = {
-                        showDropdown = false
-                        onCreateNewWallet()
-                    }
+                Icon(
+                    imageVector = Icons.Default.Face,
+                    contentDescription = "Avatar",
+                    tint = PhantomBg,
+                    modifier = Modifier.size(18.dp)
                 )
             }
         }
 
-        // Network & Address Copy Pill
-        if (currentWallet != null) {
-            Surface(
-                color = PhantomSurface,
-                shape = RoundedCornerShape(16.dp),
-                border = androidx.compose.foundation.BorderStroke(1.dp, PhantomBorder),
-                modifier = Modifier.clickable { onCopyAddress() }
-            ) {
-                Row(
-                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
-                    verticalAlignment = Alignment.CenterVertically
+        Spacer(modifier = Modifier.width(12.dp))
+
+        // Home | Trade | Explore Capsule Pills
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            val tabs = listOf("Home", "Trade", "Explore")
+            tabs.forEachIndexed { i, title ->
+                val sel = activeTopTab == i
+                Surface(
+                    color = if (sel) PhantomPurple else PhantomSurfaceHigh,
+                    shape = RoundedCornerShape(20.dp),
+                    modifier = Modifier.clickable { onSelectTopTab(i) }
                 ) {
-                    Box(
-                        modifier = Modifier
-                            .size(8.dp)
-                            .clip(CircleShape)
-                            .background(SolanaTeal)
-                    )
-                    Spacer(modifier = Modifier.width(6.dp))
                     Text(
-                        text = truncateAddr(currentWallet.address),
-                        color = PhantomTextSecondary,
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Medium
-                    )
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Icon(
-                        imageVector = Icons.Default.ContentCopy,
-                        contentDescription = "Copy Address",
-                        tint = PhantomTextSecondary,
-                        modifier = Modifier.size(13.dp)
+                        text = title,
+                        color = if (sel) Color.Black else PhantomTextSecondary,
+                        fontWeight = if (sel) FontWeight.ExtraBold else FontWeight.SemiBold,
+                        fontSize = 14.sp,
+                        modifier = Modifier.padding(horizontal = 18.dp, vertical = 8.dp)
                     )
                 }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun AccountsBottomSheetModal(
+    wallets: List<WalletEntity>,
+    onDismiss: () -> Unit,
+    onSelectWallet: (Int) -> Unit,
+    onCreateWallet: () -> Unit
+) {
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
+        containerColor = PhantomBg
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(horizontal = 20.dp)
+                .padding(bottom = 36.dp)
+        ) {
+            // Top Bar: X | Your Accounts | +
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Surface(
+                    color = PhantomSurface,
+                    shape = CircleShape,
+                    modifier = Modifier
+                        .size(32.dp)
+                        .clickable { onDismiss() }
+                ) {
+                    Box(contentAlignment = Alignment.Center) {
+                        Icon(Icons.Default.Close, contentDescription = "Close", tint = PhantomText, modifier = Modifier.size(18.dp))
+                    }
+                }
+
+                Text(
+                    text = "Your Accounts",
+                    color = PhantomText,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold
+                )
+
+                Surface(
+                    color = PhantomSurface,
+                    shape = CircleShape,
+                    modifier = Modifier
+                        .size(32.dp)
+                        .clickable {
+                            onDismiss()
+                            onCreateWallet()
+                        }
+                ) {
+                    Box(contentAlignment = Alignment.Center) {
+                        Icon(Icons.Default.Add, contentDescription = "Add Account", tint = PhantomText, modifier = Modifier.size(18.dp))
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            // Account Cards
+            wallets.forEach { wallet ->
+                Card(
+                    colors = CardDefaults.cardColors(containerColor = PhantomSurface),
+                    shape = RoundedCornerShape(20.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            onSelectWallet(wallet.id)
+                            onDismiss()
+                        }
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .padding(16.dp)
+                            .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            // Avatar Pill with Checkmark
+                            Box(contentAlignment = Alignment.BottomEnd) {
+                                Surface(
+                                    color = PhantomSurfaceHigh,
+                                    shape = CircleShape,
+                                    modifier = Modifier.size(40.dp)
+                                ) {
+                                    Box(contentAlignment = Alignment.Center) {
+                                        Text(wallet.name.take(2).uppercase(), color = PhantomTextSecondary, fontWeight = FontWeight.Bold)
+                                    }
+                                }
+                                if (wallet.isSelected) {
+                                    Surface(
+                                        color = PhantomPurple,
+                                        shape = CircleShape,
+                                        modifier = Modifier.size(18.dp)
+                                    ) {
+                                        Box(contentAlignment = Alignment.Center) {
+                                            Icon(Icons.Default.Check, contentDescription = "Selected", tint = PhantomBg, modifier = Modifier.size(12.dp))
+                                        }
+                                    }
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.width(14.dp))
+
+                            Column {
+                                Text(wallet.name, color = PhantomText, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                                Text("$0.00", color = PhantomTextSecondary, fontSize = 13.sp)
+                            }
+                        }
+
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+                            Surface(color = PhantomSurfaceHigh, shape = RoundedCornerShape(12.dp)) {
+                                Icon(Icons.Default.GridView, contentDescription = "QR", tint = PhantomText, modifier = Modifier.padding(8.dp).size(18.dp))
+                            }
+                            Surface(color = PhantomSurfaceHigh, shape = RoundedCornerShape(12.dp)) {
+                                Icon(Icons.Default.MoreHoriz, contentDescription = "Menu", tint = PhantomText, modifier = Modifier.padding(8.dp).size(18.dp))
+                            }
+                        }
+                    }
+                }
+                Spacer(modifier = Modifier.height(10.dp))
             }
         }
     }
@@ -205,8 +273,8 @@ fun PhantomBottomBar(
     onTabSelected: (Int) -> Unit
 ) {
     NavigationBar(
-        containerColor = PhantomSurface,
-        tonalElevation = 8.dp,
+        containerColor = PhantomBg,
+        tonalElevation = 0.dp,
         modifier = Modifier.navigationBarsPadding()
     ) {
         val navItems = listOf(
@@ -241,7 +309,7 @@ fun PhantomBottomBar(
                 colors = NavigationBarItemDefaults.colors(
                     selectedIconColor = PhantomPurple,
                     selectedTextColor = PhantomPurple,
-                    indicatorColor = PhantomSurfaceHigh,
+                    indicatorColor = PhantomSurface,
                     unselectedIconColor = PhantomTextSecondary,
                     unselectedTextColor = PhantomTextSecondary
                 )

@@ -84,108 +84,124 @@ fun OnboardingScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    listOf(PhantomSurfaceHigh, PhantomBg, PhantomBg)
-                )
-            ),
+            .background(PhantomBg),
         contentAlignment = Alignment.Center
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.padding(32.dp)
+            verticalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 28.dp, vertical = 48.dp)
         ) {
-            Box(
-                modifier = Modifier
-                    .size(96.dp)
-                    .clip(CircleShape)
-                    .background(PhantomPurple.copy(alpha = 0.2f)),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = Icons.Default.AccountBalanceWallet,
-                    contentDescription = "Wallet",
-                    tint = PhantomPurple,
-                    modifier = Modifier.size(56.dp)
+            Spacer(modifier = Modifier.height(20.dp))
+
+            // Center Hero Illustration Area
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Box(
+                    modifier = Modifier
+                        .size(130.dp)
+                        .clip(CircleShape)
+                        .background(PhantomSurfaceHigh),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.AccountBalanceWallet,
+                        contentDescription = "Phantom Ghost",
+                        tint = PhantomPurple,
+                        modifier = Modifier.size(70.dp)
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(36.dp))
+
+                Text(
+                    text = "Trusted by 20+ million",
+                    color = PhantomTextSecondary,
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Medium
+                )
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                Text(
+                    text = "Your Home for\nTrading Crypto and\nMore",
+                    color = PhantomText,
+                    fontSize = 32.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    textAlign = TextAlign.Center,
+                    lineHeight = 38.sp
                 )
             }
-            Spacer(modifier = Modifier.height(24.dp))
-            Text(
-                text = "Phantom",
-                color = PhantomText,
-                fontSize = 32.sp,
-                fontWeight = FontWeight.ExtraBold
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = "A non-custodial Solana wallet to manage Web3 assets, portfolios, and instant blockchain transfers safely.",
-                color = PhantomTextSecondary,
-                fontSize = 14.sp,
-                textAlign = TextAlign.Center,
-                lineHeight = 20.sp
-            )
 
-            Spacer(modifier = Modifier.height(48.dp))
+            // Bottom Action Area
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(
+                    text = "By continuing, you agree to the Terms and Privacy Policy",
+                    color = PhantomTextSecondary,
+                    fontSize = 11.sp,
+                    textAlign = TextAlign.Center
+                )
 
-            Button(
-                onClick = onCreateClick,
-                colors = ButtonDefaults.buttonColors(containerColor = PhantomPurpleBright, contentColor = Color.White),
-                shape = RoundedCornerShape(16.dp),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp)
-            ) {
-                Text("Create a New Wallet", fontSize = 16.sp, fontWeight = FontWeight.Bold)
-            }
+                Spacer(modifier = Modifier.height(16.dp))
 
-            Spacer(modifier = Modifier.height(16.dp))
+                Button(
+                    onClick = onCreateClick,
+                    colors = ButtonDefaults.buttonColors(containerColor = PhantomPurple, contentColor = PhantomBg),
+                    shape = RoundedCornerShape(26.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(54.dp)
+                ) {
+                    Text("Create a New Wallet", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                }
 
-            Surface(
-                color = PhantomSurface,
-                shape = RoundedCornerShape(16.dp),
-                border = androidx.compose.foundation.BorderStroke(1.dp, PhantomBorder),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp)
-                    .clickable { showImport = true }
-            ) {
-                Box(contentAlignment = Alignment.Center) {
-                    Text("I Already Have a Wallet", color = PhantomText, fontWeight = FontWeight.Bold, fontSize = 15.sp)
+                Spacer(modifier = Modifier.height(12.dp))
+
+                Surface(
+                    color = Color.Transparent,
+                    shape = RoundedCornerShape(26.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(54.dp)
+                        .clickable { showImport = true }
+                ) {
+                    Box(contentAlignment = Alignment.Center) {
+                        Text("I Already Have a Wallet", color = PhantomText, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                    }
                 }
             }
-
-            Spacer(modifier = Modifier.height(32.dp))
         }
 
         if (showImport) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(PhantomBg.copy(alpha = 0.9f))
+                    .background(PhantomBg.copy(alpha = 0.95f))
                     .clickable { showImport = false },
                 contentAlignment = Alignment.Center
             ) {
                 Card(
                     colors = CardDefaults.cardColors(containerColor = PhantomSurface),
-                    shape = RoundedCornerShape(20.dp),
+                    shape = RoundedCornerShape(24.dp),
                     modifier = Modifier
                         .padding(24.dp)
                         .fillMaxWidth()
                         .clickable(enabled = false) {}
                 ) {
-                    Column(modifier = Modifier.padding(20.dp)) {
-                        Text("Import Recovery Phrase", color = PhantomText, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                    Column(modifier = Modifier.padding(24.dp)) {
+                        Text("Import Recovery Phrase", color = PhantomText, fontWeight = FontWeight.Bold, fontSize = 20.sp)
                         Spacer(modifier = Modifier.height(8.dp))
-                        Text("Paste your 12-word recovery phrase to restore your wallet.", color = PhantomTextSecondary, fontSize = 12.sp)
+                        Text("Paste your 12-word recovery phrase to restore your wallet.", color = PhantomTextSecondary, fontSize = 13.sp)
                         Spacer(modifier = Modifier.height(16.dp))
                         OutlinedTextField(
                             value = importText,
                             onValueChange = { importText = it },
                             placeholder = { Text("apple banana cherry...", color = PhantomTextSecondary.copy(alpha = 0.5f)) },
                             colors = OutlinedTextFieldDefaults.colors(focusedTextColor = PhantomText, unfocusedTextColor = PhantomText),
-                            modifier = Modifier.fillMaxWidth().height(100.dp)
+                            modifier = Modifier.fillMaxWidth().height(110.dp)
                         )
-                        Spacer(modifier = Modifier.height(20.dp))
+                        Spacer(modifier = Modifier.height(24.dp))
                         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
                             Text(
                                 "Cancel",
@@ -194,15 +210,16 @@ fun OnboardingScreen(
                                     .clickable { showImport = false }
                                     .padding(12.dp)
                             )
-                            Spacer(modifier = Modifier.width(8.dp))
+                            Spacer(modifier = Modifier.width(12.dp))
                             Button(
                                 onClick = {
                                     showImport = false
                                     onImportClick(importText)
                                 },
-                                colors = ButtonDefaults.buttonColors(containerColor = PhantomPurple)
+                                colors = ButtonDefaults.buttonColors(containerColor = PhantomPurple, contentColor = PhantomBg),
+                                shape = RoundedCornerShape(16.dp)
                             ) {
-                                Text("Import", color = PhantomBg, fontWeight = FontWeight.Bold)
+                                Text("Import", fontWeight = FontWeight.Bold)
                             }
                         }
                     }
@@ -216,7 +233,8 @@ fun OnboardingScreen(
 fun SeedPhraseBackupScreen(
     wallet: WalletEntity,
     onConfirmSaved: () -> Unit,
-    onCopyPhrase: () -> Unit
+    onCopyPhrase: () -> Unit,
+    onBack: () -> Unit
 ) {
     val words = wallet.seedPhrase.split(" ")
 
@@ -224,88 +242,190 @@ fun SeedPhraseBackupScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(PhantomBg)
-            .padding(24.dp),
+            .padding(horizontal = 24.dp, vertical = 20.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceBetween
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Spacer(modifier = Modifier.height(20.dp))
-            Text("Secret Recovery Phrase", color = PhantomText, fontSize = 24.sp, fontWeight = FontWeight.Bold)
+            // Top Bar: Back | Stepper | Help
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Close, // Using Close or Arrow
+                    contentDescription = "Back",
+                    tint = PhantomText,
+                    modifier = Modifier.size(24.dp).clickable { onBack() }
+                )
+                Text("— • — —", color = PhantomPurple, fontWeight = FontWeight.Bold)
+                Surface(color = PhantomSurfaceHigh, shape = CircleShape) {
+                    Text("?", color = PhantomTextSecondary, fontWeight = FontWeight.Bold, modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp))
+                }
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+            Text("Recovery phrase", color = PhantomText, fontSize = 26.sp, fontWeight = FontWeight.ExtraBold)
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                "This is the master key to your wallet. Write down these 12 words in order.",
+                "This is the only way you will be able to recover your account. Please store it somewhere safe!",
                 color = PhantomTextSecondary,
-                fontSize = 13.sp,
-                textAlign = TextAlign.Center
+                fontSize = 14.sp,
+                textAlign = TextAlign.Center,
+                lineHeight = 20.sp
             )
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(28.dp))
 
-            Card(
-                colors = CardDefaults.cardColors(containerColor = PhantomSurface),
-                shape = RoundedCornerShape(20.dp),
-                modifier = Modifier.fillMaxWidth()
+            // 2 Columns of 12 Words exactly like Screenshot 3
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(2),
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                verticalArrangement = Arrangement.spacedBy(10.dp),
+                modifier = Modifier.height(260.dp)
             ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    LazyVerticalGrid(
-                        columns = GridCells.Fixed(3),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp),
-                        modifier = Modifier.height(220.dp)
-                    ) {
-                        itemsIndexed(words) { i, word ->
-                            Surface(
-                                color = PhantomSurfaceHigh,
-                                shape = RoundedCornerShape(8.dp)
-                            ) {
-                                Row(
-                                    modifier = Modifier.padding(8.dp),
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Text("${i + 1}.", color = PhantomTextSecondary, fontSize = 11.sp)
-                                    Spacer(modifier = Modifier.width(4.dp))
-                                    Text(word, color = PhantomText, fontWeight = FontWeight.Bold, fontSize = 13.sp)
-                                }
-                            }
-                        }
-                    }
-
-                    Spacer(modifier = Modifier.height(12.dp))
+                itemsIndexed(words) { i, word ->
                     Surface(
-                        color = PhantomPurple.copy(alpha = 0.15f),
+                        color = PhantomSurface,
                         shape = RoundedCornerShape(12.dp),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable { onCopyPhrase() }
+                        modifier = Modifier.fillMaxWidth()
                     ) {
                         Row(
-                            modifier = Modifier.padding(12.dp),
-                            horizontalArrangement = Arrangement.Center,
+                            modifier = Modifier.padding(horizontal = 14.dp, vertical = 12.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Icon(Icons.Default.ContentCopy, contentDescription = "Copy", tint = PhantomPurple, modifier = Modifier.size(16.dp))
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text("Copy Recovery Phrase", color = PhantomPurple, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                            Text("${i + 1}", color = PhantomTextSecondary, fontSize = 12.sp, modifier = Modifier.width(22.dp))
+                            Text(word, color = PhantomText, fontWeight = FontWeight.Bold, fontSize = 14.sp)
                         }
                     }
                 }
             }
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            // Copy Button
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.clickable { onCopyPhrase() }.padding(8.dp)
+            ) {
+                Icon(Icons.Default.ContentCopy, contentDescription = "Copy", tint = PhantomTextSecondary, modifier = Modifier.size(16.dp))
+                Spacer(modifier = Modifier.width(8.dp))
+                Text("Copy to clipboard", color = PhantomTextSecondary, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
+            }
         }
 
-        Column {
-            Button(
-                onClick = onConfirmSaved,
-                colors = ButtonDefaults.buttonColors(containerColor = PhantomPurpleBright),
-                shape = RoundedCornerShape(16.dp),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp)
-            ) {
-                Text("Okay, I saved it", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
-            }
-            Spacer(modifier = Modifier.height(16.dp))
+        Button(
+            onClick = onConfirmSaved,
+            colors = ButtonDefaults.buttonColors(containerColor = PhantomPurple, contentColor = PhantomBg),
+            shape = RoundedCornerShape(26.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(54.dp)
+        ) {
+            Text("OK, I Saved It", fontSize = 16.sp, fontWeight = FontWeight.Bold)
         }
     }
 }
+
+@Composable
+fun ChooseUsernameScreen(
+    wallet: WalletEntity,
+    onContinue: (String) -> Unit,
+    onBack: () -> Unit
+) {
+    var username by remember { mutableStateOf("") }
+    val suggested = "HighOsprey5116"
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(PhantomBg)
+            .padding(horizontal = 24.dp, vertical = 20.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.SpaceBetween
+    ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            // Top Bar: Back | Stepper | Help
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Close,
+                    contentDescription = "Back",
+                    tint = PhantomText,
+                    modifier = Modifier.size(24.dp).clickable { onBack() }
+                )
+                Text("— — • —", color = PhantomPurple, fontWeight = FontWeight.Bold)
+                Surface(color = PhantomSurfaceHigh, shape = CircleShape) {
+                    Text("?", color = PhantomTextSecondary, fontWeight = FontWeight.Bold, modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp))
+                }
+            }
+
+            Spacer(modifier = Modifier.height(36.dp))
+
+            // Cute orange character avatar circle
+            Box(
+                modifier = Modifier
+                    .size(80.dp)
+                    .clip(CircleShape)
+                    .background(Color(0xFFFF7556)),
+                contentAlignment = Alignment.Center
+            ) {
+                Text("👾", fontSize = 42.sp)
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+            Text("Choose a username", color = PhantomText, fontSize = 26.sp, fontWeight = FontWeight.ExtraBold)
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                "Use a unique name to easily send and receive with friends",
+                color = PhantomTextSecondary,
+                fontSize = 14.sp,
+                textAlign = TextAlign.Center
+            )
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            // Text Input @username
+            OutlinedTextField(
+                value = username,
+                onValueChange = { username = it },
+                placeholder = { Text("@username", color = PhantomTextSecondary.copy(alpha = 0.5f)) },
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedTextColor = PhantomText,
+                    unfocusedTextColor = PhantomText,
+                    focusedContainerColor = PhantomSurface,
+                    unfocusedContainerColor = PhantomSurface,
+                    focusedBorderColor = Color.Transparent,
+                    unfocusedBorderColor = Color.Transparent
+                ),
+                shape = RoundedCornerShape(16.dp),
+                modifier = Modifier.fillMaxWidth().height(60.dp)
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Row {
+                Text("Suggested: ", color = PhantomTextSecondary, fontSize = 13.sp)
+                Text(suggested, color = PhantomPurple, fontWeight = FontWeight.Bold, fontSize = 13.sp, modifier = Modifier.clickable { username = suggested })
+            }
+        }
+
+        Button(
+            onClick = { onContinue(username.ifBlank { suggested }) },
+            colors = ButtonDefaults.buttonColors(containerColor = PhantomPurple, contentColor = PhantomBg),
+            shape = RoundedCornerShape(26.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(54.dp)
+        ) {
+            Text("Continue", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+        }
+    }
+}
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -697,3 +817,119 @@ fun EduTopicSheet(
         }
     }
 }
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TxDetailsModalSheet(
+    tx: com.example.data.TransactionEntity,
+    onDismiss: () -> Unit,
+    onCopy: (String) -> Unit
+) {
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        containerColor = PhantomSurface
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(horizontal = 24.dp)
+                .padding(bottom = 40.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                Text("Transaction Details", color = PhantomText, fontWeight = FontWeight.Bold, fontSize = 20.sp)
+                IconButton(onClick = onDismiss) {
+                    Icon(Icons.Default.Close, contentDescription = "Close", tint = PhantomTextSecondary)
+                }
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Status Capsule
+            Surface(
+                color = PhantomGreen.copy(alpha = 0.15f),
+                shape = RoundedCornerShape(16.dp),
+                border = androidx.compose.foundation.BorderStroke(1.dp, PhantomGreen.copy(alpha = 0.4f))
+            ) {
+                Row(modifier = Modifier.padding(horizontal = 14.dp, vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Text("●", color = PhantomGreen, fontSize = 12.sp)
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text(tx.status, color = PhantomGreen, fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            val isPos = tx.type == "RECEIVE" || tx.type == "DEPOSIT"
+            Text(
+                text = (if (isPos) "+" else if (tx.type == "SEND") "-" else "") + String.format("%,.4f %s", tx.amount, if (tx.type == "SWAP") "" else tx.tokenSymbol),
+                color = if (isPos) PhantomGreen else if (tx.type == "SEND") PhantomText else SolanaTeal,
+                fontSize = 32.sp,
+                fontWeight = FontWeight.ExtraBold
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = when (tx.type) {
+                    "DEPOSIT" -> "Instant Asset Deposit"
+                    "RECEIVE" -> "Incoming Blockchain Transfer"
+                    "SEND" -> "Outgoing Token Transfer"
+                    else -> "Decentralized Liquidity Swap"
+                },
+                color = PhantomTextSecondary,
+                fontSize = 14.sp
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // Detail Cards Box
+            Card(
+                colors = CardDefaults.cardColors(containerColor = PhantomSurfaceHigh.copy(alpha = 0.5f)),
+                shape = RoundedCornerShape(16.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                        Text("Date & Time", color = PhantomTextSecondary, fontSize = 13.sp)
+                        val dateStr = try {
+                            java.text.SimpleDateFormat("MMM dd, yyyy • hh:mm a", java.util.Locale.getDefault()).format(java.util.Date(tx.timestamp))
+                        } catch (e: Exception) { "Just now" }
+                        Text(dateStr, color = PhantomText, fontWeight = FontWeight.Medium, fontSize = 13.sp)
+                    }
+
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                        Text(if (tx.type == "RECEIVE") "Sender" else "Recipient / DEX", color = PhantomTextSecondary, fontSize = 13.sp)
+                        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.clickable { onCopy(tx.counterpartAddress) }) {
+                            Text(if (tx.counterpartAddress.length > 20) "${tx.counterpartAddress.take(8)}...${tx.counterpartAddress.takeLast(6)}" else tx.counterpartAddress, color = PhantomPurple, fontWeight = FontWeight.SemiBold, fontSize = 13.sp)
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Icon(Icons.Default.ContentCopy, contentDescription = "Copy", tint = PhantomPurple, modifier = Modifier.size(14.dp))
+                        }
+                    }
+
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                        Text("Network Fee", color = PhantomTextSecondary, fontSize = 13.sp)
+                        Text("${tx.feeSol} SOL (< $0.001)", color = PhantomText, fontWeight = FontWeight.Medium, fontSize = 13.sp)
+                    }
+
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                        Text("Signature Hash", color = PhantomTextSecondary, fontSize = 13.sp)
+                        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.clickable { onCopy(tx.signatureHash) }) {
+                            Text(tx.signatureHash, color = SolanaTeal, fontWeight = FontWeight.SemiBold, fontSize = 13.sp)
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Icon(Icons.Default.ContentCopy, contentDescription = "Copy", tint = SolanaTeal, modifier = Modifier.size(14.dp))
+                        }
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Button(
+                onClick = { onCopy("https://solscan.io/tx/${tx.signatureHash}") },
+                colors = ButtonDefaults.buttonColors(containerColor = PhantomPurple, contentColor = PhantomBg),
+                shape = RoundedCornerShape(16.dp),
+                modifier = Modifier.fillMaxWidth().height(52.dp)
+            ) {
+                Text("Copy Explorer Link", fontWeight = FontWeight.Bold, fontSize = 15.sp)
+            }
+        }
+    }
+}
+

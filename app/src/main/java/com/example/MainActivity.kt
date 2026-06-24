@@ -24,6 +24,9 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -34,7 +37,9 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.ui.AppScreen
 import com.example.ui.WalletViewModel
+import com.example.ui.components.AccountsBottomSheetModal
 import com.example.ui.components.ActivityTabContent
+import com.example.ui.components.ChooseUsernameScreen
 import com.example.ui.components.CollectiblesTabContent
 import com.example.ui.components.EduTopicSheet
 import com.example.ui.components.FaucetModalSheet
@@ -49,6 +54,7 @@ import com.example.ui.components.SettingsTabContent
 import com.example.ui.components.SwapTabContent
 import com.example.ui.components.TokenManageModalSheet
 import com.example.ui.components.TokensTabContent
+import com.example.ui.components.TxDetailsModalSheet
 import com.example.ui.theme.MyApplicationTheme
 import com.example.ui.theme.PhantomBg
 import com.example.ui.theme.PhantomGreen
@@ -78,6 +84,9 @@ fun PhantomAppRoot(viewModel: WalletViewModel) {
     val isBroadcasting by viewModel.isBroadcasting.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
+    var activeTopTab by remember { mutableStateOf(0) } // 0: Home, 1: Trade, 2: Explore
+    var showAccountsModal by remember { mutableStateOf(false) }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -86,17 +95,41 @@ fun PhantomAppRoot(viewModel: WalletViewModel) {
         when (val screen = activeScreen) {
             is AppScreen.Onboarding -> {
                 OnboardingScreen(
-                    onCreateClick = { viewModel.createAccount("Main Account 1") },
+                    onCreateClick = { viewModel.createAccount("Account 1") },
                     onImportClick = { viewModel.importExistingAccount(it) }
                 )
             }
             is AppScreen.SeedBackup -> {
                 SeedPhraseBackupScreen(
                     wallet = screen.wallet,
-                    onConfirmSaved = { viewModel.navigateTo(AppScreen.Dashboard) },
+                    onConfirmSaved = {
+                        if (screen.isNew) {
+                            viewModel.navigateTo(AppScreen.ChooseUsername(screen.wallet))
+                        } else {
+                            viewModel.navigateTo(AppScreen.Dashboard)
+                        }
+                    },
                     onCopyPhrase = {
                         copyToClipboard(context, screen.wallet.seedPhrase)
                         viewModel.showToast("Recovery phrase copied to clipboard")
+                    },
+                    onBack = {
+                        if (screen.isNew) {
+                            viewModel.navigateTo(AppScreen.Onboarding)
+                        } else {
+                            viewModel.navigateTo(AppScreen.Dashboard)
+                        }
+                    }
+                )
+            }
+            is AppScreen.ChooseUsername -> {
+                ChooseUsernameScreen(
+                    wallet = screen.wallet,
+                    onContinue = { chosenName ->
+                        viewModel.finishUsernameSetup(screen.wallet, chosenName)
+                    },
+                    onBack = {
+                        viewModel.navigateTo(AppScreen.SeedBackup(screen.wallet, isNew = true))
                     }
                 )
             }
@@ -110,43 +143,23 @@ fun PhantomAppRoot(viewModel: WalletViewModel) {
                             PhantomTopHeader(
                                 wallets = dashboardState.wallets,
                                 currentWallet = dashboardState.currentWallet,
-                                onSelectWallet = { viewModel.selectAccount(it) },
-                                onCreateNewWallet = { viewModel.createAccount("Account ${dashboardState.wallets.size + 1}") },
-                                onCopyAddress = {
-                                    dashboardState.currentWallet?.let {
-                                        copyToClipboard(context, it.address)
-                                        viewModel.showToast("Address copied")
+                                activeTopTab = activeTopTab,
+                                onSelectTopTab = { selectedTop ->
+                                    activeTopTab = selectedTop
+                                    if (selectedTop == 1) {
+                                        viewModel.setTab(2) // Switch bottom to Swap when Trade is chosen
+                                    } else if (activeTab == 2) {
+                                        viewModel.setTab(0)
                                     }
-                                }
+                                },
+                                onOpenAccountsModal = { showAccountsModal = true }
                             )
                         }
-                    },
-                    bottomBar = {
-                        PhantomBottomBar(
-                            selectedTab = activeTab,
-                            onTabSelected = { viewModel.setTab(it) }
-                        )
                     }
                 ) { paddingValues ->
                     Box(modifier = Modifier.padding(paddingValues).fillMaxSize()) {
-                        when (activeTab) {
-                            0 -> TokensTabContent(
-                                totalBalanceUsd = dashboardState.totalBalanceUsd,
-                                tokens = dashboardState.tokens,
-                                onReceiveClick = { viewModel.navigateTo(AppScreen.ReceiveModal) },
-                                onSendClick = { viewModel.navigateTo(AppScreen.SendFlow) },
-                                onSwapClick = { viewModel.setTab(2) },
-                                onFaucetClick = { viewModel.navigateTo(AppScreen.DepositModal) },
-                                onTokenClick = { viewModel.navigateTo(AppScreen.TokenManage(it)) }
-                            )
-                            1 -> CollectiblesTabContent(
-                                collectibles = dashboardState.collectibles,
-                                onReceiveClick = {
-                                    viewModel.depositAssets("SOL", 0.5)
-                                    viewModel.showToast("Collectible incoming...")
-                                }
-                            )
-                            2 -> SwapTabContent(
+                        if (activeTopTab == 1 || activeTab == 2) {
+                            SwapTabContent(
                                 tokens = dashboardState.tokens,
                                 isBroadcasting = isBroadcasting,
                                 onSwap = { from, to, fromAmt, toAmt ->
@@ -156,6 +169,29 @@ fun PhantomAppRoot(viewModel: WalletViewModel) {
                                     HelpTopicsList.find { it.id == topicId }?.let {
                                         viewModel.navigateTo(AppScreen.HelpModal(it))
                                     }
+                                }
+                            )
+                        } else when (activeTab) {
+                            0 -> TokensTabContent(
+                                activeTopTab = activeTopTab,
+                                currentAccountName = dashboardState.currentWallet?.name ?: "Account 1",
+                                totalBalanceUsd = dashboardState.totalBalanceUsd,
+                                tokens = dashboardState.tokens,
+                                onOpenAccountsModal = { showAccountsModal = true },
+                                onReceiveClick = { viewModel.navigateTo(AppScreen.ReceiveModal) },
+                                onSendClick = { viewModel.navigateTo(AppScreen.SendFlow) },
+                                onSwapClick = {
+                                    activeTopTab = 1
+                                    viewModel.setTab(2)
+                                },
+                                onFaucetClick = { viewModel.navigateTo(AppScreen.DepositModal) },
+                                onTokenClick = { viewModel.navigateTo(AppScreen.TokenManage(it)) }
+                            )
+                            1 -> CollectiblesTabContent(
+                                collectibles = dashboardState.collectibles,
+                                onReceiveClick = {
+                                    viewModel.depositAssets("SOL", 0.5)
+                                    viewModel.showToast("Collectible incoming...")
                                 }
                             )
                             3 -> ActivityTabContent(
@@ -177,6 +213,16 @@ fun PhantomAppRoot(viewModel: WalletViewModel) {
                 }
             }
         }
+
+        if (showAccountsModal) {
+            AccountsBottomSheetModal(
+                wallets = dashboardState.wallets,
+                onDismiss = { showAccountsModal = false },
+                onSelectWallet = { viewModel.selectAccount(it) },
+                onCreateWallet = { viewModel.createAccount("Account ${dashboardState.wallets.size + 1}") }
+            )
+        }
+
 
         // Modals Overlay Handling
         when (val screen = activeScreen) {
@@ -225,8 +271,14 @@ fun PhantomAppRoot(viewModel: WalletViewModel) {
                 )
             }
             is AppScreen.TxDetails -> {
-                viewModel.navigateTo(AppScreen.Dashboard)
-                viewModel.showToast("Signature: ${screen.tx.signatureHash} (Confirmed)")
+                TxDetailsModalSheet(
+                    tx = screen.tx,
+                    onDismiss = { viewModel.navigateTo(AppScreen.Dashboard) },
+                    onCopy = { str ->
+                        copyToClipboard(context, str)
+                        viewModel.showToast("Copied to clipboard")
+                    }
+                )
             }
             else -> {}
         }
